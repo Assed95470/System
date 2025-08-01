@@ -14,10 +14,65 @@ import { storage } from './firebase';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { toast } from 'react-hot-toast';
 
-// --- SUPPRIMER TOUT LE COMPOSANT SBareIcon ---
+// --- DÉFINITION DES COMPOSANTS ET FONCTIONS MANQUANTS ---
+
+const Card = ({ children, style, isMobile }) => (
+  <div style={{
+    background: '#1a1a1a',
+    border: '1px solid #2a2a2a',
+    borderRadius: 12,
+    padding: isMobile ? '16px' : '20px 24px',
+    color: '#EAEAEA',
+    ...style
+  }}>
+    {children}
+  </div>
+);
+
+const Progress = ({ value }) => (
+  <div style={{
+    flex: 1,
+    height: '8px',
+    backgroundColor: '#2a2a2a',
+    borderRadius: '4px',
+    overflow: 'hidden'
+  }}>
+    <div style={{
+      width: `${value * 100}%`,
+      height: '100%',
+      background: 'linear-gradient(90deg, #1E90FF, #00BFFF)',
+      transition: 'width 0.5s ease-in-out'
+    }} />
+  </div>
+);
+
+const formatStatXp = (xp) => {
+  if (xp >= 1000) {
+    return `${(xp / 1000).toFixed(1)}k`;
+  }
+  return xp;
+};
+
+const CustomTooltip = ({ active, payload }) => {
+  if (active && payload && payload.length) {
+    return (
+      <div style={{
+        background: 'rgba(31, 31, 31, 0.9)',
+        border: '1px solid #444',
+        padding: '8px 12px',
+        borderRadius: '8px',
+        color: '#EAEAEA'
+      }}>
+        <p style={{ margin: 0 }}>{`${payload[0].payload.subject}: LV ${payload[0].value}`}</p>
+      </div>
+    );
+  }
+  return null;
+};
+
 
 export default function QuestManager({
-  name = "Ꞩ", // On utilise à nouveau le caractère directement
+  name = "Ꞩ",
   stats = {},
   profilePicUrl,
   setProfilePicUrl,
@@ -27,7 +82,6 @@ export default function QuestManager({
   const isMobile = useMediaQuery('(max-width: 768px)');
   const [isLoadingPic, setIsLoadingPic] = useState(false);
 
-  // --- Fonction pour gérer le changement de la photo ---
   const handleProfilePicChange = async (event) => {
     const file = event.target.files[0];
     if (!file) return;
@@ -51,24 +105,16 @@ export default function QuestManager({
     }
   };
 
-  // --- Logique de calcul ---
   const statLevels = statsList.map(s => getStatLevel(stats[s] || 0));
-  
-  // 1. On calcule la moyenne des niveaux (ex: 27.65)
   const avgLevel = statLevels.reduce((a, b) => a + b, 0) / statLevels.length;
-  
-  // 2. Le niveau général est la partie entière (ex: 27)
   const generalLevel = Math.floor(avgLevel);
   const generalTitle = getTitleByLevel(generalLevel);
-
-  // 3. La progression est la partie décimale (ex: 0.65, soit 65%)
   const generalProgress = avgLevel % 1;
 
-  // --- Logique pour le Radar et Strengths/Weaknesses (inchangée) ---
   const maxLevel = Math.max(...statLevels, 1);
   const radarData = statsList.map((statName, index) => ({
     subject: statName,
-    value: statLevels[index], // Correction : on accède à l'index correctement
+    value: statLevels[index],
   }));
   const sortedStats = statsList
     .map(s => [s, stats[s] || 0])
@@ -79,41 +125,37 @@ export default function QuestManager({
   return (
     <div style={{ padding: isMobile ? '3px 16px' : '3px', maxWidth: '600px', margin: '0 auto' }}>
       <h1 style={{
-        fontFamily: "'Playfair Display', serif", // La nouvelle police élégante
+        fontFamily: "'Playfair Display', serif",
         textAlign: "center",
         marginBottom: '16px',
-        fontSize: isMobile ? '2.5rem' : '3.2rem', // On peut l'agrandir un peu
-        fontWeight: '700', // On utilise le poids de police importé
+        fontSize: isMobile ? '2.5rem' : '3.2rem',
+        fontWeight: '700',
         color: '#EAEAEA',
-        lineHeight: '1.2' // Ajustement pour la nouvelle taille
+        lineHeight: '1.2'
       }}>
         {name}
       </h1>
 
       <Card isMobile={isMobile}>
-        {/* --- Section Photo de Profil --- */}
         <div style={{ textAlign: 'center', marginBottom: '20px' }}>
           <input
             type="file"
             id="profilePicInput"
             accept="image/*"
-            style={{ display: 'none' }} // On cache l'input moche
+            style={{ display: 'none' }}
             onChange={handleProfilePicChange}
           />
-          {/* Ce label est cliquable et active l'input caché */}
           <label htmlFor="profilePicInput" style={{ cursor: 'pointer' }}>
             {isLoadingPic ? (
               <div style={{ width: isMobile ? 100 : 120, height: isMobile ? 100 : 120, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                {/* Simple spinner ou texte */}
                 <p>Chargement...</p>
               </div>
             ) : profilePicUrl ? (
-              // --- NOUVEAU CONTENEUR POUR LE DÉGRADÉ ---
               <div style={{
-                padding: '3px', // Simule l'épaisseur de la bordure
+                padding: '3px',
                 borderRadius: '50%',
                 background: 'linear-gradient(45deg, #9400D3, #00BFFF)',
-                display: 'inline-block' // Pour que la div s'adapte à l'image
+                display: 'inline-block'
               }}>
                 <img 
                   src={profilePicUrl} 
@@ -123,13 +165,12 @@ export default function QuestManager({
                     height: isMobile ? 100 : 120, 
                     borderRadius: '50%', 
                     objectFit: 'cover',
-                    display: 'block', // Pour éviter les espaces indésirables
-                    border: '2px solid #1f1f1f' // Bordure intérieure pour séparer l'image du dégradé
+                    display: 'block',
+                    border: '2px solid #1f1f1f'
                   }} 
                 />
               </div>
             ) : (
-              // L'icône par défaut reste inchangée
               <svg xmlns="http://www.w3.org/2000/svg" width={isMobile ? 100 : 120} height={isMobile ? 100 : 120} fill="none" viewBox="0 0 24 24" style={{ display: 'inline-block', verticalAlign: 'middle' }}>
                 <path fill="#ccc" d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
               </svg>
@@ -137,9 +178,7 @@ export default function QuestManager({
           </label>
         </div>
 
-        {/* --- Section Niveau Général (Améliorée) --- */}
         <div style={{ marginBottom: '28px' }}>
-          {/* Remplacement du <p> par un div flexbox pour un meilleur contrôle */}
           <div style={{
             display: 'flex',
             justifyContent: 'center',
@@ -150,7 +189,6 @@ export default function QuestManager({
           }}>
             <span style={{ color: '#EAEAEA' }}>Level {generalLevel} •&nbsp;</span>
             <span style={{
-              // Application du dégradé au titre du niveau
               background: 'linear-gradient(90deg, #1E90FF, #00BFFF)',
               WebkitBackgroundClip: 'text',
               backgroundClip: 'text',
@@ -165,7 +203,6 @@ export default function QuestManager({
           </div>
         </div>
 
-        {/* --- Liste des Stats (Améliorée) --- */}
         <div style={{ marginBottom: '20px' }}>
           {statsList.map((s, index) => {
             const xp = stats[s] || 0;
@@ -185,7 +222,6 @@ export default function QuestManager({
                   <span style={{ fontSize: isMobile ? '0.8rem' : '0.85rem', color: '#888', whiteSpace: 'nowrap' }}>
                     {formatStatXp(xp)} / {nextThreshold ? formatStatXp(nextThreshold) : 'MAX'}
                   </span>
-                  {/* On applique tous les styles à une seule div pour plus de robustesse */}
                   <div style={{
                     width: '60px',
                     textAlign: 'right',
@@ -204,17 +240,15 @@ export default function QuestManager({
           })}
         </div>
 
-        {/* --- Strengths & Weaknesses (Nouveau Design) --- */}
         <div style={{
           display: 'flex',
           justifyContent: 'space-around',
           paddingTop: '20px',
           marginTop: '20px',
           borderTop: '1px solid #2a2a2a',
-          flexDirection: 'row', // Toujours en ligne
+          flexDirection: 'row',
           gap: '20px'
         }}>
-          {/* Colonne des Points Forts */}
           <div style={{ textAlign: 'center' }}>
             <h4 style={{
               margin: '0 0 8px 0',
@@ -237,11 +271,10 @@ export default function QuestManager({
             </div>
           </div>
 
-          {/* Colonne des Points Faibles */}
           <div style={{ textAlign: 'center' }}>
             <h4 style={{
               margin: '0 0 8px 0',
-              color: '#888', // Couleur neutre/sombre
+              color: '#888',
               fontSize: isMobile ? '0.8rem' : '0.9rem',
               textTransform: 'uppercase',
               letterSpacing: '1px'
@@ -259,7 +292,6 @@ export default function QuestManager({
         </div>
       </Card>
 
-      {/* --- Titre pour la carte Radar --- */}
       <h3 style={{
         fontFamily: "'ZCOOL XiaoWei', serif",
         textAlign: 'center',
@@ -270,7 +302,6 @@ export default function QuestManager({
         Reiatsu Radar
       </h3>
 
-      {/* --- CARTE RADAR (Améliorée) --- */}
       <Card isMobile={isMobile}>
         <div style={{ width: '100%', height: isMobile ? 300 : 350 }}>
           <ResponsiveContainer width="100%" height="100%">
@@ -278,7 +309,7 @@ export default function QuestManager({
               <PolarGrid gridType="polygon" stroke="#444" />
               <PolarAngleAxis 
                 dataKey="subject" 
-                tick={{ fill: "#aaa", fontSize: isMobile ? 11 : 13 }} // Labels plus lisibles
+                tick={{ fill: "#aaa", fontSize: isMobile ? 11 : 13 }}
               />
               <PolarRadiusAxis domain={[0, maxLevel]} axisLine={false} tick={false} />
               <Tooltip content={<CustomTooltip />} cursor={{ stroke: '#00BFFF', strokeWidth: 1 }} />
