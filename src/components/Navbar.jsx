@@ -3,9 +3,10 @@ import { useNavigate } from "react-router-dom";
 import logo from '../img/Photoroom_20250731_161505.png'; // Assurez-vous que ce nom de fichier est exact
 import settingsIcon from '../img/icons8-réglage-48 (3).png';
 
-export default function Navbar({ onOpenSidebar, onImport = ()=>{}, onExport = ()=>{} }) {
+export default function Navbar({ onOpenSidebar, onImport = ()=>{}, onExport = ()=>{}, onClearData = ()=>{} }) {
   const navigate = useNavigate();
   const [showSettings, setShowSettings] = useState(false);
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false); // État pour la confirmation
 
   const buttonStyle = {
     background: "none",
@@ -127,7 +128,7 @@ export default function Navbar({ onOpenSidebar, onImport = ()=>{}, onExport = ()
                 e.currentTarget.style.color = settingsButtonHoverStyle.color;
               }}
               onMouseLeave={e => {
-                e.currentTarget.style.backgroundColor = settingsButtonStyle.backgroundColor; // On utilise la bonne propriété
+                e.currentTarget.style.backgroundColor = settingsButtonStyle.backgroundColor;
                 e.currentTarget.style.color = settingsButtonStyle.color;
               }}
             >
@@ -141,15 +142,81 @@ export default function Navbar({ onOpenSidebar, onImport = ()=>{}, onExport = ()
                 e.currentTarget.style.color = settingsButtonHoverStyle.color;
               }}
               onMouseLeave={e => {
-                e.currentTarget.style.backgroundColor = settingsButtonStyle.backgroundColor; // On utilise la bonne propriété
+                e.currentTarget.style.backgroundColor = settingsButtonStyle.backgroundColor;
                 e.currentTarget.style.color = settingsButtonStyle.color;
               }}
             >
               Exporter JSON
             </button>
+            {/* --- NOUVEAU BOUTON --- */}
+            <button
+              onClick={() => {
+                setShowConfirmDialog(true); // Ouvre la confirmation
+                setShowSettings(false); // Ferme le menu
+              }}
+              style={settingsButtonStyle}
+              onMouseEnter={e => {
+                e.currentTarget.style.backgroundColor = '#c0392b'; // Rouge pour danger
+                e.currentTarget.style.color = '#fff';
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.backgroundColor = settingsButtonStyle.backgroundColor;
+                e.currentTarget.style.color = settingsButtonStyle.color;
+              }}
+            >
+              Vider les données
+            </button>
           </div>
         )}
       </div>
+
+      {/* --- NOUVELLE BOÎTE DE DIALOGUE DE CONFIRMATION --- */}
+      {showConfirmDialog && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(0, 0, 0, 0.7)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 2000
+        }}>
+          <div style={{
+            background: '#1f1f1f',
+            padding: '24px',
+            borderRadius: '12px',
+            border: '1px solid #2a2a2a',
+            textAlign: 'center',
+            maxWidth: '90%',
+            width: '350px'
+          }}>
+            <h3 style={{ marginTop: 0, color: '#EAEAEA' }}>Êtes-vous sûr ?</h3>
+            <p style={{ color: '#aaa', marginBottom: '24px' }}>
+              Toutes vos données (stats, quêtes, etc.) seront définitivement supprimées. Cette action est irréversible.
+            </p>
+            <div style={{ display: 'flex', justifyContent: 'space-between', gap: '12px' }}>
+              <button
+                onClick={() => setShowConfirmDialog(false)}
+                style={{ ...settingsButtonStyle, flex: 1, textAlign: 'center', backgroundColor: '#2a2a2a' }}
+              >
+                Annuler
+              </button>
+              <button
+                onClick={() => {
+                  onClearData();
+                  setShowConfirmDialog(false);
+                }}
+                style={{ ...settingsButtonStyle, flex: 1, textAlign: 'center', backgroundColor: '#c0392b', color: '#fff' }}
+              >
+                Confirmer la suppression
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </nav>
   );
 }

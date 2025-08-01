@@ -119,6 +119,17 @@ export default function App() {
     input.click();
   };
 
+  // --- NOUVELLE FONCTION POUR VIDER LES DONNÉES ---
+  const handleClearData = () => {
+    // Remet tous les états à leurs valeurs par défaut
+    setStats({});
+    setQuests({ quotidienne: [], secondaire: [], principale: [] });
+    setErrors([]);
+    setValidatedHistory([]);
+    setProfilePicUrl(null);
+    toast.success('Toutes les données ont été réinitialisées.');
+  };
+
   // On retire la balise <Router> qui enveloppait le tout
   return (
     <>
@@ -136,6 +147,7 @@ export default function App() {
         onOpenSidebar={() => setSidebarOpen(true)}
         onImport={handleImport}
         onExport={handleExport}
+        onClearData={handleClearData} // On passe la fonction ici
       />
       <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
