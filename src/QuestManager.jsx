@@ -10,6 +10,9 @@ import {
 } from "recharts";
 import { useMediaQuery } from "./hooks/useMediaQuery";
 import { statsList, xpThresholds, getStatLevel, getTitleByLevel } from "./utils/stats";
+import { storage } from './firebase';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { toast } from 'react-hot-toast';
 
 // --- NOUVEAUX COMPOSANTS STYLISÉS ---
 
@@ -75,26 +78,37 @@ const CustomTooltip = ({ active, payload }) => {
 
 
 export default function QuestManager({
-  name = "Ꞩ", // On remet le S barré, qui va maintenant fonctionner
+  name = "Ꞩ",
   stats = {},
   profilePicUrl,
   setProfilePicUrl,
-  quests = {},
-  errors = [],
-  validatedHistory = [],
+  userDocId,
   style = {}
 }) {
   const isMobile = useMediaQuery('(max-width: 768px)');
-  // --- État pour stocker l'URL de la photo de profil ---
-  const [profilePic, setProfilePic] = useState(null);
+  const [isLoadingPic, setIsLoadingPic] = useState(false);
 
   // --- Fonction pour gérer le changement de la photo ---
-  const handleProfilePicChange = (event) => {
-    if (event.target.files && event.target.files[0]) {
-      // Crée une URL locale pour l'image sélectionnée
-      const imageUrl = URL.createObjectURL(event.target.files[0]);
-      setProfilePic(imageUrl);
-      setProfilePicUrl(imageUrl); // Met à jour l'URL de la photo de profil dans l'état parent
+  const handleProfilePicChange = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    setIsLoadingPic(true);
+    const toastId = toast.loading('Téléchargement de l\'image...');
+
+    const storageRef = ref(storage, `profile-pictures/${userDocId}`);
+
+    try {
+      await uploadBytes(storageRef, file);
+      const downloadURL = await getDownloadURL(storageRef);
+      setProfilePicUrl(downloadURL);
+
+      toast.success('Photo de profil mise à jour !', { id: toastId });
+    } catch (error) {
+      console.error("Erreur lors du téléchargement de l'image:", error);
+      toast.error("Échec du téléchargement.", { id: toastId });
+    } finally {
+      setIsLoadingPic(false);
     }
   };
 
@@ -148,7 +162,12 @@ export default function QuestManager({
           />
           {/* Ce label est cliquable et active l'input caché */}
           <label htmlFor="profilePicInput" style={{ cursor: 'pointer' }}>
-            {profilePic ? (
+            {isLoadingPic ? (
+              <div style={{ width: isMobile ? 100 : 120, height: isMobile ? 100 : 120, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                {/* Simple spinner ou texte */}
+                <p>Chargement...</p>
+              </div>
+            ) : profilePicUrl ? (
               // --- NOUVEAU CONTENEUR POUR LE DÉGRADÉ ---
               <div style={{
                 padding: '3px', // Simule l'épaisseur de la bordure
@@ -157,7 +176,7 @@ export default function QuestManager({
                 display: 'inline-block' // Pour que la div s'adapte à l'image
               }}>
                 <img 
-                  src={profilePic} 
+                  src={profilePicUrl} 
                   alt="Profile" 
                   style={{ 
                     width: isMobile ? 100 : 120, 

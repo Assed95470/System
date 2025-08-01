@@ -20,6 +20,7 @@ export default function App() {
   const [quests, setQuests] = useState({ quotidienne: [], secondaire: [], principale: [] });
   const [errors, setErrors] = useState([]);
   const [validatedHistory, setValidatedHistory] = useState([]);
+  const [profilePicUrl, setProfilePicUrl] = useState(null); // <-- AJOUTER CETTE LIGNE
 
   // ID unique pour les données de l'utilisateur. Pour l'instant, il est fixe.
   const userDocId = "mainUserData";
@@ -35,6 +36,7 @@ export default function App() {
         setQuests(data.quests || { quotidienne: [], secondaire: [], principale: [] });
         setErrors(data.errors || []);
         setValidatedHistory(data.validatedHistory || []);
+        setProfilePicUrl(data.profilePicUrl || null); // <-- AJOUTER CETTE LIGNE
       } else {
         // Si le document n'existe pas, on peut le créer avec des valeurs par défaut
         console.log("Aucune donnée trouvée, initialisation avec des valeurs par défaut.");
@@ -53,7 +55,7 @@ export default function App() {
 
     const saveData = async () => {
       const docRef = doc(db, "userData", userDocId);
-      const payload = { stats, quests, errors, validatedHistory };
+      const payload = { stats, quests, errors, validatedHistory, profilePicUrl }; // <-- MODIFIER CETTE LIGNE
       try {
         await setDoc(docRef, payload, { merge: true }); // merge: true pour ne pas écraser les champs non modifiés
       } catch (error) {
@@ -63,7 +65,7 @@ export default function App() {
     };
 
     saveData();
-  }, [stats, quests, errors, validatedHistory, isDataLoaded]);
+  }, [stats, quests, errors, validatedHistory, profilePicUrl, isDataLoaded]); // <-- MODIFIER CETTE LIGNE
 
 
   // --- Fonctions d'import/export (restent les mêmes mais agissent sur l'état actuel) ---
@@ -73,6 +75,7 @@ export default function App() {
       quests,
       errors,
       validatedHistory,
+      profilePicUrl, // <-- AJOUTER CETTE LIGNE
     };
     const jsonString = JSON.stringify(dataToExport, null, 2);
     const blob = new Blob([jsonString], { type: "application/json" });
@@ -103,6 +106,7 @@ export default function App() {
             setQuests(importedData.quests || { quotidienne: [], secondaire: [], principale: [] });
             setErrors(importedData.errors || []);
             setValidatedHistory(importedData.validatedHistory || []);
+            setProfilePicUrl(importedData.profilePicUrl || null); // <-- AJOUTER CETTE LIGNE
             toast.success('Données importées avec succès ! La synchronisation va suivre.');
           } catch (error) {
             console.error("Erreur lors de l'importation du fichier JSON:", error);
@@ -141,9 +145,9 @@ export default function App() {
           element={
             <QuestManager
               stats={stats}
-              quests={quests}
-              errors={errors}
-              validatedHistory={validatedHistory}
+              profilePicUrl={profilePicUrl}
+              setProfilePicUrl={setProfilePicUrl}
+              userDocId={userDocId}
             />
           }
         />
