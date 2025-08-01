@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { doc, getDoc, setDoc, onSnapshot } from "firebase/firestore";
+import { db } from "./firebase"; // Importez votre instance de base de données
 import Navbar from "./components/Navbar";
 import Sidebar from "./components/Sidebar";
 import QuestManager from "./QuestManager";
@@ -7,61 +9,64 @@ import QuestsErrors from "./QuestsErrors";
 import AnalyticsDashboard from "./AnalyticsDashboard";
 import { Toaster, toast } from 'react-hot-toast';
 
-// --- Fonctions pour la persistance des données ---
-const saveDataToLocalStorage = (state) => {
-  try {
-    const serializedState = JSON.stringify(state);
-    localStorage.setItem('questAppData', serializedState);
-  } catch (error) {
-    console.error("Erreur lors de la sauvegarde des données :", error);
-  }
-};
-
-const loadDataFromLocalStorage = () => {
-  try {
-    const serializedState = localStorage.getItem('questAppData');
-    if (serializedState === null) {
-      return undefined; // Aucune donnée sauvegardée
-    }
-    return JSON.parse(serializedState);
-  } catch (error) {
-    console.error("Erreur lors du chargement des données :", error);
-    return undefined;
-  }
-};
+// On peut supprimer les anciennes fonctions saveDataToLocalStorage et loadDataFromLocalStorage
 
 export default function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const persistedData = loadDataFromLocalStorage();
+  const [isDataLoaded, setIsDataLoaded] = useState(false); // Pour savoir quand les données sont prêtes
 
-  // L'état reste centralisé ici, mais est initialisé avec les données du localStorage
-  const [stats, setStats] = useState(persistedData?.stats || {
-    Force: 0,
-    Endurance: 0,
-    Intelligence: 0,
-    Beauté: 0,
-    Santé: 0,
-    Spiritualité: 0,
-    "Compétences Tech": 0,
-    Argent: 0,
-    Famille: 0,
-  });
-  const [quests, setQuests] = useState(persistedData?.quests || {
-    quotidienne: [],
-    secondaire: [],
-    principale: [],
-  });
-  const [errors, setErrors] = useState(persistedData?.errors || []);
-  const [validatedHistory, setValidatedHistory] = useState(persistedData?.validatedHistory || []);
+  // L'état initial est vide, il sera rempli par Firebase
+  const [stats, setStats] = useState({});
+  const [quests, setQuests] = useState({ quotidienne: [], secondaire: [], principale: [] });
+  const [errors, setErrors] = useState([]);
+  const [validatedHistory, setValidatedHistory] = useState([]);
 
-  // Hook qui sauvegarde l'état dans le localStorage à chaque modification
+  // ID unique pour les données de l'utilisateur. Pour l'instant, il est fixe.
+  const userDocId = "mainUserData";
+
+  // Ce hook se connecte à Firebase et écoute les changements en temps réel
   useEffect(() => {
-    const currentState = { stats, quests, errors, validatedHistory };
-    saveDataToLocalStorage(currentState);
-  }, [stats, quests, errors, validatedHistory]);
+    const docRef = doc(db, "userData", userDocId);
+
+    const unsubscribe = onSnapshot(docRef, (docSnap) => {
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        setStats(data.stats || {});
+        setQuests(data.quests || { quotidienne: [], secondaire: [], principale: [] });
+        setErrors(data.errors || []);
+        setValidatedHistory(data.validatedHistory || []);
+      } else {
+        // Si le document n'existe pas, on peut le créer avec des valeurs par défaut
+        console.log("Aucune donnée trouvée, initialisation avec des valeurs par défaut.");
+      }
+      setIsDataLoaded(true); // Marquer que les données sont chargées
+    });
+
+    // Nettoyer l'écouteur quand le composant est démonté
+    return () => unsubscribe();
+  }, []); // Le tableau vide [] assure que cet effet ne s'exécute qu'une fois
+
+  // Ce hook sauvegarde les données dans Firebase à chaque modification
+  useEffect(() => {
+    // Ne pas sauvegarder si les données initiales ne sont pas encore chargées
+    if (!isDataLoaded) return;
+
+    const saveData = async () => {
+      const docRef = doc(db, "userData", userDocId);
+      const payload = { stats, quests, errors, validatedHistory };
+      try {
+        await setDoc(docRef, payload, { merge: true }); // merge: true pour ne pas écraser les champs non modifiés
+      } catch (error) {
+        console.error("Erreur de sauvegarde sur Firebase:", error);
+        toast.error("Erreur de synchronisation.");
+      }
+    };
+
+    saveData();
+  }, [stats, quests, errors, validatedHistory, isDataLoaded]);
 
 
-  // --- Fonctions d'import/export ---
+  // --- Fonctions d'import/export (restent les mêmes mais agissent sur l'état actuel) ---
   const handleExport = () => {
     const dataToExport = {
       stats,
@@ -98,7 +103,7 @@ export default function App() {
             setQuests(importedData.quests || { quotidienne: [], secondaire: [], principale: [] });
             setErrors(importedData.errors || []);
             setValidatedHistory(importedData.validatedHistory || []);
-            toast.success('Données importées avec succès !');
+            toast.success('Données importées avec succès ! La synchronisation va suivre.');
           } catch (error) {
             console.error("Erreur lors de l'importation du fichier JSON:", error);
             toast.error("Le fichier sélectionné n'est pas un JSON valide.");
