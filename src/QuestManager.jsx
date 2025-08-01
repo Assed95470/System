@@ -168,16 +168,13 @@ export default function QuestManager({
   }, []);
 
   const handleFileSelect = (event) => {
-    alert("handleFileSelect called");
     if (event.target.files && event.target.files.length > 0) {
-      alert("File selected: " + event.target.files[0].name);
       const reader = new FileReader();
       reader.addEventListener('load', () => {
-        alert("FileReader loaded");
         setImageToCrop(reader.result);
       });
       reader.addEventListener('error', (e) => {
-        alert("FileReader error");
+        // Optionnellement gérer l'erreur
       });
       reader.readAsDataURL(event.target.files[0]);
       event.target.value = ""; // Important pour iOS
@@ -227,15 +224,14 @@ export default function QuestManager({
 
   return (
     <>
-      {/* --- MODALE DE RECADRAGE (AVEC CORRECTION FINALE POUR MOBILE) --- */}
+      {/* --- MODALE DE RECADRAGE --- */}
       {imageToCrop && (
-        alert("imageToCrop is set"),
         <div style={{
           position: 'fixed',
           top: 0,
           left: 0,
           width: '100vw',
-          height: 'calc(var(--vh, 1vh) * 100)', // <-- LA CORRECTION CLÉ
+          height: 'calc(var(--vh, 1vh) * 100)',
           background: 'rgba(0,0,0,0.8)',
           zIndex: 1000,
           display: 'flex',
@@ -243,7 +239,6 @@ export default function QuestManager({
           padding: '16px',
           boxSizing: 'border-box',
         }}>
-          {/* Le Cropper prend maintenant directement l'espace flexible */}
           <Cropper
             image={imageToCrop}
             crop={crop}
@@ -257,11 +252,10 @@ export default function QuestManager({
               containerStyle: {
                 flex: 1,
                 minHeight: 0,
-                position: 'relative' // Laisser Cropper gérer son conteneur
+                position: 'relative'
               }
             }}
           />
-          {/* Conteneur des contrôles en bas */}
           <div style={{
             flexShrink: 0,
             paddingTop: '16px',
@@ -305,7 +299,7 @@ export default function QuestManager({
               id="profilePicInput"
               accept="image/*"
               style={{ display: 'none' }}
-              onChange={handleFileSelect} // MODIFICATION ICI
+              onChange={handleFileSelect}
             />
             <label htmlFor="profilePicInput" style={{ cursor: 'pointer' }}>
               {isLoadingPic ? (
