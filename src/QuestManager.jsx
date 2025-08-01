@@ -140,7 +140,7 @@ export default function QuestManager({
   return (
     <div style={{ padding: isMobile ? '3px 16px' : '3px', maxWidth: '600px', margin: '0 auto' }}>
       <h1 style={{
-        fontFamily: "'ZCOOL XiaoWei', serif",
+        // On supprime la ligne fontFamily: "'ZCOOL XiaoWei', serif",
         textAlign: "center",
         marginBottom: '16px', // Marge réduite pour resserrer l'espace
         fontSize: isMobile ? '2rem' : '2.8rem',
