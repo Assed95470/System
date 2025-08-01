@@ -140,12 +140,12 @@ export default function QuestManager({
   return (
     <div style={{ padding: isMobile ? '3px 16px' : '3px', maxWidth: '600px', margin: '0 auto' }}>
       <h1 style={{
-        // On supprime la ligne fontFamily: "'ZCOOL XiaoWei', serif",
+        // La ligne fontFamily est bien absente, c'est parfait.
         textAlign: "center",
-        marginBottom: '16px', // Marge réduite pour resserrer l'espace
+        marginBottom: '16px',
         fontSize: isMobile ? '2rem' : '2.8rem',
         fontWeight: 'normal',
-        color: '#EAEAEA' // Changé en blanc pur
+        color: '#EAEAEA'
       }}>
         {name}
       </h1>
