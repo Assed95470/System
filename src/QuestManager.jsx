@@ -219,11 +219,16 @@ export default function QuestManager({
 
   return (
     <>
-      {/* --- MODALE DE RECADRAGE (AVEC CORRECTION POUR MOBILE) --- */}
+      {/* --- MODALE DE RECADRAGE (AVEC CORRECTION FINALE POUR MOBILE) --- */}
       {imageToCrop && (
         <div style={{
-          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-          background: 'rgba(0,0,0,0.8)', zIndex: 1000,
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100vw',
+          height: 'calc(var(--vh, 1vh) * 100)', // <-- LA CORRECTION CLÉ
+          background: 'rgba(0,0,0,0.8)',
+          zIndex: 1000,
           display: 'flex',
           flexDirection: 'column',
           padding: '16px',

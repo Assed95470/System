@@ -1,17 +1,18 @@
 import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { doc, getDoc, setDoc, onSnapshot } from "firebase/firestore";
-import { db } from "./firebase"; // Importez votre instance de base de données
+import { db } from "./firebase";
 import Navbar from "./components/Navbar";
 import Sidebar from "./components/Sidebar";
 import QuestManager from "./QuestManager";
 import QuestsErrors from "./QuestsErrors";
 import AnalyticsDashboard from "./AnalyticsDashboard";
 import { Toaster, toast } from 'react-hot-toast';
-
-// On peut supprimer les anciennes fonctions saveDataToLocalStorage et loadDataFromLocalStorage
+import useMobileViewport from './hooks/useMobileViewport'; // <-- 1. IMPORTER LE HOOK
 
 export default function App() {
+  useMobileViewport(); // <-- 2. APPELER LE HOOK
+
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isDataLoaded, setIsDataLoaded] = useState(false); // Pour savoir quand les données sont prêtes
 
