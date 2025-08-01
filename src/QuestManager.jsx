@@ -234,19 +234,24 @@ export default function QuestManager({
           padding: '16px',
           boxSizing: 'border-box',
         }}>
-          {/* Conteneur du Cropper qui s'étend pour remplir l'espace */}
-          <div style={{ position: 'relative', flex: 1, minHeight: 0 }}>
-            <Cropper
-              image={imageToCrop}
-              crop={crop}
-              zoom={zoom}
-              aspect={1}
-              cropShape="round"
-              onCropChange={setCrop}
-              onZoomChange={setZoom}
-              onCropComplete={onCropComplete}
-            />
-          </div>
+          {/* Le Cropper prend maintenant directement l'espace flexible */}
+          <Cropper
+            image={imageToCrop}
+            crop={crop}
+            zoom={zoom}
+            aspect={1}
+            cropShape="round"
+            onCropChange={setCrop}
+            onZoomChange={setZoom}
+            onCropComplete={onCropComplete}
+            style={{
+              containerStyle: {
+                flex: 1,
+                minHeight: 0,
+                position: 'relative' // Laisser Cropper gérer son conteneur
+              }
+            }}
+          />
           {/* Conteneur des contrôles en bas */}
           <div style={{
             flexShrink: 0,
