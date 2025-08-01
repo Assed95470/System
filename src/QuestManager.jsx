@@ -14,8 +14,7 @@ import { storage } from './firebase';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { toast } from 'react-hot-toast';
 
-// --- DÉFINITION DES COMPOSANTS ET FONCTIONS MANQUANTS ---
-
+// --- DÉFINITION DES COMPOSANTS (GARDER CEUX-CI) ---
 const Card = ({ children, style, isMobile }) => (
   <div style={{
     background: '#1a1a1a',
@@ -71,8 +70,45 @@ const CustomTooltip = ({ active, payload }) => {
 };
 
 
+// --- LE NOUVEAU SYMBOLE SVG DE HAUTE QUALITÉ ---
+const TitleIcon = ({ size = '3.2rem', isMobile }) => {
+  const iconSize = isMobile ? '2.5rem' : size;
+  return (
+    <svg
+      width={iconSize}
+      height={iconSize}
+      viewBox="0 0 100 100"
+      xmlns="http://www.w3.org/2000/svg"
+      style={{ verticalAlign: 'middle' }}
+    >
+      <text
+        x="50%"
+        y="50%"
+        dy="0.35em"
+        textAnchor="middle"
+        fill="#EAEAEA"
+        style={{
+          fontFamily: "'Playfair Display', serif",
+          fontSize: '90px',
+          fontWeight: 700,
+        }}
+      >
+        S
+      </text>
+      {/* Barre diagonale de bas-gauche à haut-droite, fine et courte */}
+      <line
+        x1="35" y1="55" x2="65" y2="45" 
+        stroke="#EAEAEA"
+        strokeWidth="4"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+};
+
+
 export default function QuestManager({
-  name = "Ꞩ",
+  name = "Ꞩ", // Ce n'est plus utilisé pour le titre
   stats = {},
   profilePicUrl,
   setProfilePicUrl,
@@ -124,17 +160,13 @@ export default function QuestManager({
 
   return (
     <div style={{ padding: isMobile ? '3px 16px' : '3px', maxWidth: '600px', margin: '0 auto' }}>
-      <h1 style={{
-        fontFamily: "'Playfair Display', serif",
+      <div style={{
         textAlign: "center",
         marginBottom: '16px',
-        fontSize: isMobile ? '2.5rem' : '3.2rem',
-        fontWeight: '700',
-        color: '#EAEAEA',
-        lineHeight: '1.2'
+        // On utilise un div simple pour centrer notre icône
       }}>
-        {name}
-      </h1>
+        <TitleIcon isMobile={isMobile} />
+      </div>
 
       <Card isMobile={isMobile}>
         <div style={{ textAlign: 'center', marginBottom: '20px' }}>
