@@ -90,7 +90,7 @@ const TitleIcon = ({ size = '3.2rem', isMobile }) => {
         style={{
           fontFamily: "'Playfair Display', serif",
           fontSize: '90px',
-          fontWeight: 700,
+          fontWeight: 600, // Police légèrement affinée
         }}
       >
         S
@@ -163,12 +163,13 @@ export default function QuestManager({
       <div style={{
         textAlign: "center",
         marginBottom: '16px',
-        // On utilise un div simple pour centrer notre icône
+        marginTop: '16px', // Espace ajouté au-dessus de l'icône
       }}>
         <TitleIcon isMobile={isMobile} />
       </div>
 
       <Card isMobile={isMobile}>
+        {/* --- Section Photo de Profil --- */}
         <div style={{ textAlign: 'center', marginBottom: '20px' }}>
           <input
             type="file"
