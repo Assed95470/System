@@ -8,18 +8,18 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       manifest: {
-        name: 'Quest System',
+        name: 'System', // Changé pour correspondre au nom souhaité
         short_name: 'System',
         description: 'Votre application de gestion de quêtes personnelles.',
         theme_color: '#1f1f1f',
         icons: [
           {
-            src: 'pwa-192x192.png', // Vous devrez créer cette icône
+            src: 'pwa-192x192.png',
             sizes: '192x192',
             type: 'image/png',
           },
           {
-            src: 'pwa-512x512.png', // Et celle-ci aussi
+            src: 'pwa-512x512.png',
             sizes: '512x512',
             type: 'image/png',
           },

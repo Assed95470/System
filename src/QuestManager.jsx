@@ -75,8 +75,10 @@ const CustomTooltip = ({ active, payload }) => {
 
 
 export default function QuestManager({
-  name = "Ꞩ", // Le nom par défaut est maintenant un "S" barré
+  name = "Ꞩ", // On remet le S barré, qui va maintenant fonctionner
   stats = {},
+  profilePicUrl,
+  setProfilePicUrl,
   quests = {},
   errors = [],
   validatedHistory = [],
@@ -92,6 +94,7 @@ export default function QuestManager({
       // Crée une URL locale pour l'image sélectionnée
       const imageUrl = URL.createObjectURL(event.target.files[0]);
       setProfilePic(imageUrl);
+      setProfilePicUrl(imageUrl); // Met à jour l'URL de la photo de profil dans l'état parent
     }
   };
 
