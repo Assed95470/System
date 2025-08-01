@@ -14,100 +14,10 @@ import { storage } from './firebase';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { toast } from 'react-hot-toast';
 
-// --- NOUVEAUX COMPOSANTS STYLISÉS ---
-
-const Card = ({ children, style, isMobile }) => (
-  <div style={{
-    background: '#1f1f1f',
-    borderRadius: '12px',
-    padding: isMobile ? '16px' : '24px',
-    margin: '16px 0',
-    boxShadow: '0 8px 30px rgba(0, 0, 0, 0.2)',
-    border: '1px solid #2a2a2a',
-    ...style
-  }}>
-    {children}
-  </div>
-);
-
-const Progress = ({ value }) => (
-  <div style={{ background: '#333', width: '100%', height: 8, borderRadius: 4, overflow: 'hidden' }}>
-    <div style={{ 
-      width: `${value * 100}%`, 
-      background: 'linear-gradient(90deg, #9400D3, #00BFFF)', // Dégradé appliqué ici
-      height: '100%', 
-      transition: 'width 0.5s ease-in-out' 
-    }} />
-  </div>
-);
-
-// --- Fonctions utilitaires (à garder en haut du fichier) ---
-const formatStatXp = (value) => {
-  if (value >= 100000) {
-    return `${Math.round(value / 1000)}k`;
-  }
-  return value.toLocaleString();
-};
-
-// petit composant pour positionner le point actif exactement au coord. du dataPoint
-const CustomActiveDot = ({ cx, cy }) => (
-  <circle cx={cx} cy={cy} r={6} fill="#8884d8" />
-);
-
-// --- Tooltip Corrigé et Stylisé ---
-const CustomTooltip = ({ active, payload }) => {
-  if (active && payload && payload.length) {
-    const data = payload[0].payload;
-    return (
-      <div style={{
-        background: '#1f1f1f',
-        border: '1px solid #444',
-        padding: '12px',
-        borderRadius: '8px',
-        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)'
-      }}>
-        <p style={{ margin: 0, fontWeight: "bold", color: '#EAEAEA' }}>{data.subject}</p>
-        <p style={{ margin: 0, color: '#00BFFF' }}>
-          Niveau : {Math.floor(data.value)}
-        </p>
-      </div>
-    );
-  }
-  return null;
-};
-
-// --- NOUVEAU COMPOSANT POUR LE SYMBOLE "S BARRÉ" ---
-const SBareIcon = ({ size = '2.8rem', color = '#EAEAEA', style }) => (
-  <svg 
-    width={size} 
-    height={size} 
-    viewBox="0 0 24 24" 
-    fill="none" 
-    xmlns="http://www.w3.org/2000/svg"
-    style={{ ...style, verticalAlign: 'middle' }} // Pour un bon alignement
-  >
-    <text 
-      x="50%" 
-      y="50%" 
-      dy=".3em" // Ajustement vertical pour un centrage parfait
-      textAnchor="middle" 
-      fill={color} 
-      style={{ fontSize: '20px', fontFamily: "'ZCOOL XiaoWei', serif" }} // On utilise la police stylée que vous aimez !
-    >
-      S
-    </text>
-    <path 
-      d="M4 12H20" // Coordonnées de la barre horizontale
-      stroke={color} 
-      strokeWidth="1.5" 
-      strokeLinecap="round" 
-    />
-  </svg>
-);
-
+// --- SUPPRIMER TOUT LE COMPOSANT SBareIcon ---
 
 export default function QuestManager({
-  name = "Ꞩ", // Ce 'name' ne sera plus utilisé pour le titre principal
+  name = "Ꞩ", // On utilise à nouveau le caractère directement
   stats = {},
   profilePicUrl,
   setProfilePicUrl,
@@ -169,13 +79,15 @@ export default function QuestManager({
   return (
     <div style={{ padding: isMobile ? '3px 16px' : '3px', maxWidth: '600px', margin: '0 auto' }}>
       <h1 style={{
+        fontFamily: "'Playfair Display', serif", // La nouvelle police élégante
         textAlign: "center",
         marginBottom: '16px',
-        height: isMobile ? '2rem' : '2.8rem', // On donne une hauteur fixe pour éviter les sauts
-        lineHeight: isMobile ? '2rem' : '2.8rem' // On aligne verticalement
+        fontSize: isMobile ? '2.5rem' : '3.2rem', // On peut l'agrandir un peu
+        fontWeight: '700', // On utilise le poids de police importé
+        color: '#EAEAEA',
+        lineHeight: '1.2' // Ajustement pour la nouvelle taille
       }}>
-        {/* On utilise notre nouveau composant SVG ici */}
-        <SBareIcon size={isMobile ? '2rem' : '2.8rem'} />
+        {name}
       </h1>
 
       <Card isMobile={isMobile}>
