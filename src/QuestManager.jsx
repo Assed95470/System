@@ -219,26 +219,38 @@ export default function QuestManager({
 
   return (
     <>
-      {/* --- MODALE DE RECADRAGE --- */}
+      {/* --- MODALE DE RECADRAGE (AVEC CORRECTION POUR MOBILE) --- */}
       {imageToCrop && (
         <div style={{
           position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
           background: 'rgba(0,0,0,0.8)', zIndex: 1000,
-          display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center'
+          display: 'flex',
+          flexDirection: 'column',
+          padding: '16px',
+          boxSizing: 'border-box',
         }}>
-          <div style={{ position: 'relative', width: '90%', height: '60%', maxWidth: '500px' }}>
+          {/* Conteneur du Cropper qui s'étend pour remplir l'espace */}
+          <div style={{ position: 'relative', flex: 1, minHeight: 0 }}>
             <Cropper
               image={imageToCrop}
               crop={crop}
               zoom={zoom}
               aspect={1}
-              cropShape="round" // La forme circulaire !
+              cropShape="round"
               onCropChange={setCrop}
               onZoomChange={setZoom}
               onCropComplete={onCropComplete}
             />
           </div>
-          <div style={{ padding: '16px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
+          {/* Conteneur des contrôles en bas */}
+          <div style={{
+            flexShrink: 0,
+            paddingTop: '16px',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '16px'
+          }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'white', width: '250px' }}>
               <span>Zoom</span>
               <input
