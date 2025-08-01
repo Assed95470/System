@@ -168,15 +168,19 @@ export default function QuestManager({
   }, []);
 
   const handleFileSelect = (event) => {
-    console.log("handleFileSelect called", event.target.files);
+    alert("handleFileSelect called");
     if (event.target.files && event.target.files.length > 0) {
+      alert("File selected: " + event.target.files[0].name);
       const reader = new FileReader();
       reader.addEventListener('load', () => {
-        console.log("FileReader loaded");
+        alert("FileReader loaded");
         setImageToCrop(reader.result);
       });
+      reader.addEventListener('error', (e) => {
+        alert("FileReader error");
+      });
       reader.readAsDataURL(event.target.files[0]);
-      event.target.value = ""; // <-- Réinitialise l'input pour iOS
+      event.target.value = ""; // Important pour iOS
     }
   };
 
@@ -225,7 +229,7 @@ export default function QuestManager({
     <>
       {/* --- MODALE DE RECADRAGE (AVEC CORRECTION FINALE POUR MOBILE) --- */}
       {imageToCrop && (
-        console.log("imageToCrop is set", imageToCrop),
+        alert("imageToCrop is set"),
         <div style={{
           position: 'fixed',
           top: 0,
