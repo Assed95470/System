@@ -76,9 +76,38 @@ const CustomTooltip = ({ active, payload }) => {
   return null;
 };
 
+// --- NOUVEAU COMPOSANT POUR LE SYMBOLE "S BARRÉ" ---
+const SBareIcon = ({ size = '2.8rem', color = '#EAEAEA', style }) => (
+  <svg 
+    width={size} 
+    height={size} 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    xmlns="http://www.w3.org/2000/svg"
+    style={{ ...style, verticalAlign: 'middle' }} // Pour un bon alignement
+  >
+    <text 
+      x="50%" 
+      y="50%" 
+      dy=".3em" // Ajustement vertical pour un centrage parfait
+      textAnchor="middle" 
+      fill={color} 
+      style={{ fontSize: '20px', fontFamily: "'ZCOOL XiaoWei', serif" }} // On utilise la police stylée que vous aimez !
+    >
+      S
+    </text>
+    <path 
+      d="M4 12H20" // Coordonnées de la barre horizontale
+      stroke={color} 
+      strokeWidth="1.5" 
+      strokeLinecap="round" 
+    />
+  </svg>
+);
+
 
 export default function QuestManager({
-  name = "Ꞩ",
+  name = "Ꞩ", // Ce 'name' ne sera plus utilisé pour le titre principal
   stats = {},
   profilePicUrl,
   setProfilePicUrl,
@@ -140,14 +169,13 @@ export default function QuestManager({
   return (
     <div style={{ padding: isMobile ? '3px 16px' : '3px', maxWidth: '600px', margin: '0 auto' }}>
       <h1 style={{
-        // La ligne fontFamily est bien absente, c'est parfait.
         textAlign: "center",
         marginBottom: '16px',
-        fontSize: isMobile ? '2rem' : '2.8rem',
-        fontWeight: 'normal',
-        color: '#EAEAEA'
+        height: isMobile ? '2rem' : '2.8rem', // On donne une hauteur fixe pour éviter les sauts
+        lineHeight: isMobile ? '2rem' : '2.8rem' // On aligne verticalement
       }}>
-        {name}
+        {/* On utilise notre nouveau composant SVG ici */}
+        <SBareIcon size={isMobile ? '2rem' : '2.8rem'} />
       </h1>
 
       <Card isMobile={isMobile}>
